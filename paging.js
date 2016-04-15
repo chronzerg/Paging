@@ -3,19 +3,17 @@
 
 	// AMD Support
 	if (typeof define === "function" && define.amd) {
-		define('paging', ["jquery"], factory);
+		define(factory);
 	}
-
 	// NodeJS Support
 	else if (typeof module === "object" && module.exports) {
-		module.exports = factory(require("jquery"));
+		module.exports = factory();
 	}
-
 	// Regular Support
 	else {
-		root.Paging = factory(root.jQuery);
+		root.createPaging = factory();
 	}
-})(this, function factory ($) {
+})(this, function factory () {
 	'use strict';
 
 	// Constant Keys
@@ -80,13 +78,14 @@
 			
 			// Open the page with the given id, close the currently open
 			// page, and call all relevant callbacks.
-			switchToPage: function switchToPage (id, immediately) {
+			switchToPage: function switchToPage (id, callback, immediately) {
 				var $oldPage = getOpenPage(),
 				    $newPage = getPage(id);
 
-				// TODO - What is the point of this?
-				if (immediately === undefined && $oldPage.is(':hidden')) {
-					immediately = true;
+				// If there is no page with the given id or if there are
+				// multiple pages with the given id, don't do anything.
+				if ($newPage.length != 1) {
+					return;
 				}
 
 				$oldPage.removeClass(OP);
@@ -101,6 +100,7 @@
 					callCallbacks($oldPage, AH);
 					callCallbacks($newPage, AS);
 					callCallbacksForChildren($newPage, AS);
+					if (callback) callback();
 				}
 
 				// Stop any switch page animations that may be
@@ -121,26 +121,26 @@
 
 			// Add a callback to be called before the page with
 			// the given id is hidden.
-			addBeforeHideCallback: function (id, cb) {
-				addData(getPage(id), BH, cb);
+			addBeforeHideCallback: function (id, callback) {
+				addData(getPage(id), BH, callback);
 			},
 
 			// Add a callback to be called before the page with
 			// the given id is shown.
-			addBeforeShowCallback: function (id, cb) {
-				addData(getPage(id), BS, cb);
+			addBeforeShowCallback: function (id, callback) {
+				addData(getPage(id), BS, callback);
 			},
 
 			// Add a callback to be called after the page with
 			// the given id is hidden.
-			addAfterHideCallback: function (id, cb) {
-				addData(getPage(id), AH, cb);
+			addAfterHideCallback: function (id, callback) {
+				addData(getPage(id), AH, callback);
 			},
 
 			// Add a callback to be called after the page with
 			// the given id is shown.
-			addAfterShowCallback: function (id, cb) {
-				addData(getPage(id), AS, cb);
+			addAfterShowCallback: function (id, callback) {
+				addData(getPage(id), AS, callback);
 			},
 
 			// Attach a child paging instance to the page with

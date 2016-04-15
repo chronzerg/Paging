@@ -16,9 +16,11 @@
   ],
   "devDependencies": {
     "mocha": "^2.4.5",
-    "should": "^8.3.0"
+    "should": "^8.3.0",
+    "sinon": "^1.17.3"
   },
   "dependencies": {
-    "jquery": "^2.2.3"
+    "jquery": "^2.2.3",
+    "requirejs": "^2.2.0"
   }
 }

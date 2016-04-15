@@ -1,0 +1,111 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Paging Tests</title>
+    <link href="../bower_components/mocha/mocha.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="mocha"></div>
+    <div id="pages"></div>
+
+    <script src="../bower_components/jquery/dist/jquery.js"></script>
+    <script src="../bower_components/should/should.js"></script>
+    <script src="../bower_components/mocha/mocha.js"></script>
+    <script src="../paging.js"></script>
+
+    <script>
+        var numberOfPages = 2;
+
+        // Create HTML for pages.
+        for (var i=0; i<numberOfPages; i++) {
+            var html = '<div id="page'+(i+1)+'"></div>';
+            $('#pages').append(html);
+        }
+
+        // Returns true if the target page is visible and
+        // all it's sibling are hidden. Returns false
+        // otherwise.
+        function checkPageVisibility ($target) {
+            return $target.is(':visible') && !$target.siblings().is(':visible');
+        }
+
+        mocha.setup('bdd')
+
+        var paging;
+        describe('createPaging()', function () {
+            it('should return a paging instance', function () {
+                paging = createPaging($('#pages').children());
+                should.exist(paging);
+                paging.should.have.property('switchToPage');
+            });
+
+            it('should hide all but the first element', function () {
+                checkPageVisibility($('#page1')).should.be.true();
+            });
+        });
+
+        describe('switchToPage()', function () {
+            it('should hide all but the target page', function (done) {
+                paging.switchToPage('page1', null, true);
+
+                // Check immediately transitions
+                paging.switchToPage('page2', null, true);
+                checkPageVisibility($('#page2')).should.be.true();
+
+                // Check fade transitions
+                paging.switchToPage('page1', function () {
+                    checkPageVisibility($('#page1')).should.be.true();
+                    done();
+                });
+            });
+        });
+
+        describe('before-hide callback', function () {
+            it('should be called before the page is hidden', function (done) {
+                paging.switchToPage('page1', null, true);
+                paging.addBeforeHideCallback('page1', function () {
+                    checkPageVisibility('page1').should.be.true();
+                    done();
+                });
+                paging.switchToPage('page2', null, true);
+            });
+        });
+
+        describe('before-show callback', function () {
+            it('should be called before the page is revealed', function (done) {
+                paging.switchToPage('page1', null, true);
+                paging.addBeforeShowCallback('page2', function () {
+                    checkPageVisibility('page1').should.be.true();
+                    done();
+                });
+                paging.switchToPage('page2', null, true);
+            });
+        });
+
+        describe('after-hide callback', function () {
+            it('should be called after the page is hidden', function (done) {
+                paging.switchToPage('page1', null, true);
+                paging.addAfterHideCallback('page1', function () {
+                    checkPageVisibility('page2').should.be.true();
+                    done();
+                });
+                paging.switchToPage('page2');
+            });
+        });
+
+        describe('after-show callback', function () {
+            it('should be called after the page is revealed', function (done) {
+                paging.switchToPage('page1', null, true);
+                paging.addAfterShowCallback('page2', function () {
+                    checkPageVisibility('page2').should.be.true();
+                    done();
+                });
+                paging.switchToPage('page2');
+            });
+        });
+
+        mocha.checkLeaks();
+        mocha.run();
+    </script>
+</body>
+</html>
