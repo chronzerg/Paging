@@ -1,11 +1,7 @@
 {
   "name": "paging",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Simulate multiple webpages on a single webpage.",
-  "main": "lib/paging.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "commonjs": "node_modules/.bin/mocha test/commonjs.js"
   },
@@ -20,10 +16,11 @@
   },
   "homepage": "https://github.com/chronzerg/Paging#readme",
   "devDependencies": {
+    "jquery": "^1.7.4",
+    "jsdom": "^8.3.1",
+    "jsdom-global": "^1.7.0",
     "mocha": "^2.4.5",
+    "mocha-jsdom": "^1.1.0",
     "should": "^8.3.0"
-  },
-  "dependencies": {
-    "jquery": "^2.2.3"
   }
 }

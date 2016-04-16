@@ -31,7 +31,7 @@
 	function addData ($page, dataId, item) {
 		var data = $page.data(dataId) || [];
 		data.push(item);
-		$page.data(dataId, item);
+		$page.data(dataId, data);
 	}
 
 	// Call the callbacks attached to the given dataId on the
