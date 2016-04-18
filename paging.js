@@ -3,63 +3,89 @@
 
 	// AMD Support
 	if (typeof define === "function" && define.amd) {
-		define(factory);
+		define(['lodash'], factory);
 	}
 	// NodeJS Support
 	else if (typeof module === "object" && module.exports) {
-		module.exports = factory();
+		module.exports = factory(require('lodash'));
 	}
 	// Regular Support
 	else {
-		root.createPaging = factory();
+		root.createPaging = factory(root.lodash);
 	}
-})(this, function factory () {
+})(this, function factory (_) {
 	'use strict';
 
-	// Constant Keys
-	var BH = "pagingBeforeHideCallbacks",
-		BS = "pagingBeforeShowCallbacks",
-		AH = "pagingAfterHideCallbacks",
-		AS = "pagingAfterShowCallbacks",
-		CH = "pagingChildInstance",
-		OP = "pagingOpen",
+	// Data types
+	var BH = "paging_BeforeHideCallbacks",
+		BS = "paging_BeforeShowCallbacks",
+		AH = "paging_AfterHideCallbacks",
+		AS = "paging_AfterShowCallbacks",
+		CH = "paging_ChildInstance",
 
-		FADE_TIME = 200;
+	// Open page class
+		OP = "paging-open";
 
-	// Add item to the list stored at the given
-	// dataId for the given page.
-	function addData ($page, dataId, item) {
-		var data = $page.data(dataId) || [];
-		data.push(item);
-		$page.data(dataId, data);
+	// Calling getDataId() returns the next
+	// data ID to be used in identifying
+	// callbacks and child instances.
+	var getDataId = (function () {
+		var nextId = 0;
+
+		return function () {
+			var id = nextId;
+			nextId++;
+			return id;
+		};
+	})();
+
+	// Add data of dataType to the given $page.
+	function addData ($page, dataType, item) {
+		var dataId = getDataId(),
+			data = $page.data(dataType) || {};
+		data[dataId] = item;
+		$page.data(dataType, data);
+
+		// Return a method which removes the added callback.
+		return function pagingRemover () {
+			var data = $page.data(dataType);
+			delete data[dataId];
+			$page.data(dataType, data);
+		};
 	}
 
-	// Call the callbacks attached to the given dataId on the
+	// Call the callbacks attached to the given dataType on the
 	// given page.
-	function callCallbacks ($page, dataId) {
-		var callbacks = $page.data(dataId);
+	function callCallbacks ($page, dataType) {
+		var callbacks = $page.data(dataType);
 		if (callbacks !== undefined) {
-			for (var i = 0; i < callbacks.length; i++) {
-				callbacks[i]();
+			for (var dataId in callbacks) {
+				callbacks[dataId]();
 			}
 		}
 	}
 
 	// Runs down the chain of children for the given page
 	// calling the given callback on their open page.
-	function callCallbacksForChildren($page, dataId) {
+	function callCallbacksForChildren($page, dataType) {
 		var children = $page.data(CH) || [];
 
-		(function callChildrenCallbacks (children) {
+		(function callCallbacksRecursively (children) {
 			children.forEach(function (paging) {
 				var openPage = paging._getOpenPage();
-				paging._callCallbacks(openPage, dataId);
-				callChildrenCallbacks(openPage.data(CH) || []);
+				paging._callCallbacks(openPage, dataType);
+				callCallbacksRecursively(openPage.data(CH) || []);
 			});
 		})(children);
 	}
 
-	return function Paging ($pages) {
+	var defaults = {
+		fadeTime: 400
+	};
+
+	return function Paging ($pages, options) {
+
+		var options = _.defaults(options, defaults);
 
 		// Get the page specified by the id.
 		function getPage (id) {
@@ -114,7 +140,7 @@
 				else {
 					$oldPage.fadeOut({
 						complete: showNewPage,
-						duration: FADE_TIME
+						duration: options.fadeTime
 					});
 				}
 			},
@@ -122,25 +148,25 @@
 			// Add a callback to be called before the page with
 			// the given id is hidden.
 			addBeforeHideCallback: function (id, callback) {
-				addData(getPage(id), BH, callback);
+				return addData(getPage(id), BH, callback);
 			},
 
 			// Add a callback to be called before the page with
 			// the given id is shown.
 			addBeforeShowCallback: function (id, callback) {
-				addData(getPage(id), BS, callback);
+				return addData(getPage(id), BS, callback);
 			},
 
 			// Add a callback to be called after the page with
 			// the given id is hidden.
 			addAfterHideCallback: function (id, callback) {
-				addData(getPage(id), AH, callback);
+				return addData(getPage(id), AH, callback);
 			},
 
 			// Add a callback to be called after the page with
 			// the given id is shown.
 			addAfterShowCallback: function (id, callback) {
-				addData(getPage(id), AS, callback);
+				return addData(getPage(id), AS, callback);
 			},
 
 			// Attach a child paging instance to the page with
@@ -149,7 +175,7 @@
 			// show' and 'after show' callbacks called. This is
 			// recursively applied down the generations.
 			attachChildPaging: function (id, pagingInstance) {
-				addData(getPage(id), CH, pagingInstance);
+				return addData(getPage(id), CH, pagingInstance);
 			},
 
 			// Internal use

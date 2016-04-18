@@ -13,7 +13,7 @@
     <script src="../bower_components/mocha/mocha.js"></script>
 
     <script>
-        mocha.setup('bdd')
+        mocha.setup('bdd');
 
         describe('createPaging', function () {
             it('should return a paging instance', function (done) {
@@ -21,7 +21,7 @@
                     var paging = createPaging($());
                     paging.should.have.property('switchToPage');
                     done();
-                });             
+                });
             });
         });
 

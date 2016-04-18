@@ -42,16 +42,15 @@ describe('createPaging()', function () {
 });
 
 describe('switchToPage()', function () {
-    it('should hide all but the target page', function (done) {
+    it('should hide all but the target page', function () {
+        this.paging.switchToPage('page2', null, true);
+        checkPageVisibility(this.$('#page2')).should.be.true();
+    });
+
+    it('should call the switchToPage callback when complete', function (done) {
         var self = this;
-
-        // Check immediately transitions
-        self.paging.switchToPage('page2', null, true);
-        checkPageVisibility(self.$('#page2')).should.be.true();
-
-        // Check fade transitions
-        self.paging.switchToPage('page1', function () {
-            checkPageVisibility(self.$('#page1')).should.be.true();
+        self.paging.switchToPage('page2', function () {
+            checkPageVisibility(self.$('#page2')).should.be.true();
             done();
         });
     });
@@ -86,7 +85,7 @@ describe('after-hide callback', function () {
             checkPageVisibility(self.$('#page2')).should.be.true();
             done();
         });
-        self.paging.switchToPage('page2');
+        self.paging.switchToPage('page2', null, true);
     });
 });
 
@@ -97,6 +96,16 @@ describe('after-show callback', function () {
             checkPageVisibility(self.$('#page2')).should.be.true();
             done();
         });
-        self.paging.switchToPage('page2');
+        self.paging.switchToPage('page2', null, true);
+    });
+});
+
+describe('callback remover', function () {
+    it('should remove the callback before its called', function () {
+        var remover = this.paging.addBeforeHideCallback('page1', function () {
+            throw new Error('Removed callback was called.');
+        });
+        remover();
+        this.paging.switchToPage('page2', null, true);
     });
 });
