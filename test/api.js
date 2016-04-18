@@ -13,35 +13,45 @@ function checkPageVisibility ($target) {
 }
 
 var createPaging = require('../paging.js');
-var $, paging;
+var should = require('should');
+
 beforeEach(function () {
+    // Initialize the DOM
     this.dom = require('jsdom-global')();
-    $ = require('jquery');
-    $('body').html(body);
-    paging = createPaging($('#pages').children());
+
+    // Initialize jQuery
+    this.$ = require('jquery');
+
+    // Add the HTML test elements.
+    this.$('body').html(body);
+
+    // Initialize a paging instance.
+    this.paging = createPaging(this.$('#pages').children());
 });
 
 afterEach(function () {
+    // Deconstruct the DOM
     this.dom();
 });
 
 describe('createPaging()', function () {
     it('should hide all but the first element', function () {
-        checkPageVisibility($('#page1')).should.be.true();
+        var self = this;
+        checkPageVisibility(self.$('#page1')).should.be.true();
     });
 });
 
 describe('switchToPage()', function () {
     it('should hide all but the target page', function (done) {
-        paging.switchToPage('page1', null, true);
+        var self = this;
 
         // Check immediately transitions
-        paging.switchToPage('page2', null, true);
-        checkPageVisibility($('#page2')).should.be.true();
+        self.paging.switchToPage('page2', null, true);
+        checkPageVisibility(self.$('#page2')).should.be.true();
 
         // Check fade transitions
-        paging.switchToPage('page1', function () {
-            checkPageVisibility($('#page1')).should.be.true();
+        self.paging.switchToPage('page1', function () {
+            checkPageVisibility(self.$('#page1')).should.be.true();
             done();
         });
     });
@@ -49,44 +59,44 @@ describe('switchToPage()', function () {
 
 describe('before-hide callback', function () {
     it('should be called before the page is hidden', function (done) {
-        paging.switchToPage('page1', null, true);
-        paging.addBeforeHideCallback('page1', function () {
-            checkPageVisibility($('#page1')).should.be.true();
+        var self = this;
+        self.paging.addBeforeHideCallback('page1', function () {
+            checkPageVisibility(self.$('#page1')).should.be.true();
             done();
         });
-        paging.switchToPage('page2', null, true);
+        self.paging.switchToPage('page2', null, true);
     });
 });
 
 describe('before-show callback', function () {
     it('should be called before the page is revealed', function (done) {
-        paging.switchToPage('page1', null, true);
-        paging.addBeforeShowCallback('page2', function () {
-            checkPageVisibility($('#page1')).should.be.true();
+        var self = this;
+        self.paging.addBeforeShowCallback('page2', function () {
+            checkPageVisibility(self.$('#page1')).should.be.true();
             done();
         });
-        paging.switchToPage('page2', null, true);
+        self.paging.switchToPage('page2', null, true);
     });
 });
 
 describe('after-hide callback', function () {
     it('should be called after the page is hidden', function (done) {
-        paging.switchToPage('page1', null, true);
-        paging.addAfterHideCallback('page1', function () {
-            checkPageVisibility($('#page2')).should.be.true();
+        var self = this;
+        self.paging.addAfterHideCallback('page1', function () {
+            checkPageVisibility(self.$('#page2')).should.be.true();
             done();
         });
-        paging.switchToPage('page2');
+        self.paging.switchToPage('page2');
     });
 });
 
 describe('after-show callback', function () {
     it('should be called after the page is revealed', function (done) {
-        paging.switchToPage('page1', null, true);
-        paging.addAfterShowCallback('page2', function () {
-            checkPageVisibility($('#page2')).should.be.true();
+        var self = this;
+        self.paging.addAfterShowCallback('page2', function () {
+            checkPageVisibility(self.$('#page2')).should.be.true();
             done();
         });
-        paging.switchToPage('page2');
+        self.paging.switchToPage('page2');
     });
 });
