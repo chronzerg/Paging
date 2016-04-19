@@ -47,15 +47,15 @@
 
         <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.11.1/lodash.min.js"></script>
-        <script src="../paging.js"></script>
+        <script src="../unipage.js"></script>
         <script>
-            var mainPaging = createPaging($('#main-pages').children('div'));
-            var subPaging = createPaging($('#sub-pages').children('div'));
+            var mainPages = setupUnipage($('#main-pages').children('div'));
+            var subPages = setupUnipage($('#sub-pages').children('div'));
 
-            $('#button1').click(function () { mainPaging.switchToPage('main-page1'); });
-            $('#button2').click(function () { mainPaging.switchToPage('main-page2'); });
-            $('#button3').click(function () { subPaging.switchToPage('sub-page1'); });
-            $('#button4').click(function () { subPaging.switchToPage('sub-page2'); });
+            $('#button1').click(function () { mainPages.switchToPage('main-page1'); });
+            $('#button2').click(function () { mainPages.switchToPage('main-page2'); });
+            $('#button3').click(function () { subPages.switchToPage('sub-page1'); });
+            $('#button4').click(function () { subPages.switchToPage('sub-page2'); });
         </script>
     </body>
 </html>

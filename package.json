@@ -1,30 +1,29 @@
 {
-  "name": "paging",
-  "version": "0.0.0",
+  "name": "unipage",
+  "version": "0.1.0",
   "description": "Simulate multiple webpages on a single webpage.",
   "scripts": {
-    "commonjs": "node_modules/.bin/mocha test/commonjs.js"
+    "test": "node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chronzerg/Paging.git"
+    "url": "git+https://github.com/chronzerg/Unipage.git"
   },
   "author": "Jon Anderson <jon.david.anderson@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/chronzerg/Paging/issues"
+    "url": "https://github.com/chronzerg/Unipage/issues"
   },
-  "homepage": "https://github.com/chronzerg/Paging#readme",
+  "homepage": "https://github.com/chronzerg/Unipage#readme",
   "devDependencies": {
     "callback-count": "^0.2.0",
-    "jquery": "^1.7.4",
-    "jsdom": "^8.3.1",
+    "jsdom": "^8.4.0",
     "jsdom-global": "^1.7.0",
     "mocha": "^2.4.5",
-    "mocha-jsdom": "^1.1.0",
     "should": "^8.3.0"
   },
   "dependencies": {
-    "lodash": "^4.11.1"
+    "lodash": "^4.11.1",
+    "jquery": "^1.7.4"
   }
 }

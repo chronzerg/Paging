@@ -11,20 +11,20 @@
 	}
 	// Regular Support
 	else {
-		root.createPaging = factory(root._);
+		root.setupUnipage = factory(root._);
 	}
 })(this, function factory (_) {
 	'use strict';
 
 	// Data types
-	var BH = "paging_BeforeHideCallbacks",
-		BS = "paging_BeforeShowCallbacks",
-		AH = "paging_AfterHideCallbacks",
-		AS = "paging_AfterShowCallbacks",
-		CH = "paging_ChildInstances",
+	var BH = "unipage_BeforeHideCallbacks",
+		BS = "unipage_BeforeShowCallbacks",
+		AH = "unipage_AfterHideCallbacks",
+		AS = "unipage_AfterShowCallbacks",
+		CH = "unipage_ChildInstances",
 
 	// Open page class
-		OP = "paging-open";
+		OP = "unipage-open";
 
 	// Calling getDataId() returns the next
 	// data ID to be used in identifying
@@ -71,9 +71,9 @@
 		var children = $page.data(CH) || {};
 
 		(function callCallbacksRecursively (children) {
-			_.forOwn(children, function callChildsCallbacks (paging) {
-				var $openPage = paging._getOpenPage();
-				paging._callCallbacks($openPage, dataType);
+			_.forOwn(children, function callChildsCallbacks (unipage) {
+				var $openPage = unipage._getOpenPage();
+				unipage._callCallbacks($openPage, dataType);
 				callCallbacksRecursively($openPage.data(CH) || {});
 			});
 		})(children);
@@ -83,7 +83,7 @@
 		fadeTime: 400
 	};
 
-	return function Paging ($pages, options) {
+	return function setupUnipage ($pages, options) {
 
 		var options = _.defaults(options, defaults);
 
@@ -179,13 +179,13 @@
 				return addData(getPage(id), AS, callback);
 			},
 
-			// Attach a child paging instance to the page with
+			// Attach a child unipage instance to the page with
 			// the given id. When said page is shown, the open
 			// page of the child instance will get its 'before
 			// show' and 'after show' callbacks called. This is
 			// recursively applied down the generations.
-			attachChildPaging: function (id, pagingInstance) {
-				return addData(getPage(id), CH, pagingInstance);
+			attachChildUnipage: function (id, unipageInstance) {
+				return addData(getPage(id), CH, unipageInstance);
 			},
 
 			// Internal use

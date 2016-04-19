@@ -12,9 +12,9 @@ function checkPageVisibility ($target) {
     return $target.is(':visible') && !$target.siblings().is(':visible');
 }
 
-var createPaging = require('../paging.js');
-var should = require('should');
+var setupUnipage = require('../unipage.js');
 var cbCounter = require('callback-count');
+var should = require('should');
 
 beforeEach(function () {
     // Initialize the DOM
@@ -27,7 +27,7 @@ beforeEach(function () {
     this.$('body').html(body);
 
     // Initialize a paging instance.
-    this.paging = createPaging(this.$('#pages').children());
+    this.paging = setupUnipage(this.$('#pages').children());
 });
 
 afterEach(function () {
@@ -133,7 +133,7 @@ describe('child instances', function () {
         // Setup child
         this.$('#page2').append('<div id="child1-pages"></div>');
         this.$('#child1-pages').append('<div id="child1-page1"></div>');
-        var child = createPaging(this.$('#child1-pages').children());
+        var child = setupUnipage(this.$('#child1-pages').children());
         child.addBeforeShowCallback('child1-page1', function () {
             count.next();
         });
@@ -141,14 +141,14 @@ describe('child instances', function () {
         // Setup grandchild
         this.$('#child1-page1').append('<div id="child2-pages"></div>');
         this.$('#child2-pages').append('<div id="child2-page1"></div>');
-        var grandchild = createPaging(this.$('#child2-pages').children());
+        var grandchild = setupUnipage(this.$('#child2-pages').children());
         grandchild.addAfterShowCallback('child2-page1', function () {
             count.next();
         });
 
         // Setup hierarchy
-        child.attachChildPaging('child1-page1', grandchild);
-        this.paging.attachChildPaging('page2', child);
+        child.attachChildUnipage('child1-page1', grandchild);
+        this.paging.attachChildUnipage('page2', child);
 
         this.paging.switchToPage('page2', null, true);
     });
