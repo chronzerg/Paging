@@ -39,6 +39,17 @@
 		};
 	})();
 
+	// Returns a remover function which removes the data
+	// item with the given data id, of the given data type,
+	// from the given $page.
+	function getRemover ($page, dataType, dataId) {
+		return function remover () {
+			var data = $page.data(dataType);
+			delete data[dataId];
+			$page.data(dataType, data);
+		};
+	}
+
 	// Add data of dataType to the given $page.
 	function addData ($page, dataType, item) {
 		var dataId = getDataId(),
@@ -47,11 +58,7 @@
 		$page.data(dataType, data);
 
 		// Return a method which removes the added callback.
-		return function removeData () {
-			var data = $page.data(dataType);
-			delete data[dataId];
-			$page.data(dataType, data);
-		};
+		return getRemover($page, dataType, dataId);
 	}
 
 	// Call the callbacks attached to the given dataType on the
