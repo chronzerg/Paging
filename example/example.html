@@ -1,0 +1,67 @@
+<html>
+    <head>
+        <style>
+            body {
+                text-align: center;
+                color: white;
+            }
+
+            #main-pages > div {
+                background-color: darkblue;
+                width: 400px;
+                margin: 10px auto;
+                padding: 10px;
+            }
+
+            #sub-pages > div {
+                background-color: blue;
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="main-pages">
+
+            <!-- Main Pages -->
+            <div id="main-page1">
+                <h1>Main Page 1</h1>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla sed ligula eget turpis accumsan dignissim. Ut commodo ex nunc, vitae interdum nunc imperdiet quis. Donec mollis odio sit amet mauris gravida, a euismod dolor pellentesque. Duis molestie magna tristique eros efficitur ultrices. Etiam ut risus ultrices, blandit tortor ut, vulputate mi. Cras et auctor ex. Fusce hendrerit lacus nec nibh elementum fringilla. Curabitur porta vitae diam at euismod. In nec tempus magna, dictum interdum dolor. Maecenas varius, velit et vulputate pharetra, ex mi mollis urna, vel mollis eros orci et ante. In porttitor quis eros non laoreet. Curabitur eleifend iaculis sapien, at molestie erat porta convallis. Fusce eu erat ut turpis dapibus consectetur sit amet vel magna. Mauris suscipit ornare mollis. Aliquam tellus lectus, cursus at eros id, hendrerit scelerisque odio.</p>
+            </div>
+            <div id="main-page2">
+                <h1>Main Page 2</h1>
+                <div id="sub-pages">
+
+                    <!-- Sub Pages of Main Page 2 -->
+                    <div id="sub-page1">
+                        <h1>Sub Page 1</h1>
+                        <p>Quisque lacinia augue vel diam mollis, id placerat odio dignissim. Nunc sit amet varius orci. Morbi congue diam a eros sodales, quis malesuada felis ornare. Donec a malesuada erat. Maecenas sollicitudin, velit nec tempus lobortis, odio ante sollicitudin mauris, a commodo enim arcu at ipsum. Fusce viverra nisi lobortis consequat bibendum. Cras at congue eros. Duis dapibus sit amet justo eget auctor. Sed vulputate elit ligula, lobortis scelerisque tortor egestas a. Aliquam erat volutpat. Fusce tristique enim aliquam, placerat justo sed, cursus augue.</p>
+                    </div>
+                    <div id="sub-page2">
+                        <h1>Sub Page 2</h1>
+                        <p>Cras lacinia dui sit amet feugiat scelerisque. Integer pretium mi arcu, ut mollis quam eleifend id. Morbi id enim molestie, euismod metus nec, egestas nisl. In hac habitasse platea dictumst. Aliquam feugiat nisi id magna rhoncus varius. Nulla facilisi. Donec ligula velit, facilisis sit amet ipsum a, elementum pulvinar diam.</p>
+                    </div>
+
+                    <button id="button3">Sub Page 1</button>
+                    <button id="button4">Sub Page 2</button>
+                </div>
+            </div>
+
+            <button id="button1">Main Page 1</button>
+            <button id="button2">Main Page 2</button>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.11.1/lodash.min.js"></script>
+        <script src="../paging.js"></script>
+        <script>
+            var mainPaging = createPaging($('#main-pages').children('div'));
+            var subPaging = createPaging($('#sub-pages').children('div'));
+
+            $('#button1').click(function () { mainPaging.switchToPage('main-page1'); });
+            $('#button2').click(function () { mainPaging.switchToPage('main-page2'); });
+            $('#button3').click(function () { subPaging.switchToPage('sub-page1'); });
+            $('#button4').click(function () { subPaging.switchToPage('sub-page2'); });
+        </script>
+    </body>
+</html>

@@ -11,7 +11,7 @@
 	}
 	// Regular Support
 	else {
-		root.createPaging = factory(root.lodash);
+		root.createPaging = factory(root._);
 	}
 })(this, function factory (_) {
 	'use strict';
@@ -21,7 +21,7 @@
 		BS = "paging_BeforeShowCallbacks",
 		AH = "paging_AfterHideCallbacks",
 		AS = "paging_AfterShowCallbacks",
-		CH = "paging_ChildInstance",
+		CH = "paging_ChildInstances",
 
 	// Open page class
 		OP = "paging-open";
@@ -29,7 +29,7 @@
 	// Calling getDataId() returns the next
 	// data ID to be used in identifying
 	// callbacks and child instances.
-	var getDataId = (function () {
+	var getDataId = (function getDataIdFactory () {
 		var nextId = 0;
 
 		return function () {
@@ -47,7 +47,7 @@
 		$page.data(dataType, data);
 
 		// Return a method which removes the added callback.
-		return function pagingRemover () {
+		return function removeData () {
 			var data = $page.data(dataType);
 			delete data[dataId];
 			$page.data(dataType, data);
@@ -68,13 +68,13 @@
 	// Runs down the chain of children for the given page
 	// calling the given callback on their open page.
 	function callCallbacksForChildren($page, dataType) {
-		var children = $page.data(CH) || [];
+		var children = $page.data(CH) || {};
 
 		(function callCallbacksRecursively (children) {
-			children.forEach(function (paging) {
-				var openPage = paging._getOpenPage();
-				paging._callCallbacks(openPage, dataType);
-				callCallbacksRecursively(openPage.data(CH) || []);
+			_.forOwn(children, function callChildsCallbacks (paging) {
+				var $openPage = paging._getOpenPage();
+				paging._callCallbacks($openPage, dataType);
+				callCallbacksRecursively($openPage.data(CH) || {});
 			});
 		})(children);
 	}
@@ -108,9 +108,11 @@
 				var $oldPage = getOpenPage(),
 				    $newPage = getPage(id);
 
-				// If there is no page with the given id or if there are
-				// multiple pages with the given id, don't do anything.
-				if ($newPage.length != 1) {
+				// If there is no page with the given id, don't do anything.
+				// According to the jQuery docs, the ID selector in getPage()
+				// will never return multiple pages so we don't check for
+				// that case.
+				if ($newPage.length === 0) {
 					return;
 				}
 
