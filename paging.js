@@ -116,6 +116,11 @@
 					return;
 				}
 
+				// If this page is already open, do nothing.
+				if ($newPage.is($oldPage)) {
+					return;
+				}
+
 				$oldPage.removeClass(OP);
 				$newPage.addClass(OP);
 
@@ -132,8 +137,11 @@
 				}
 
 				// Stop any switch page animations that may be
-				// happening now.
-				$pages.stop();
+				// happening now and reshow the old page. Reshowing
+				// undoes any partial animation which has been
+				// applied to the page.
+				$pages.stop(true, true).hide();
+				$oldPage.show();
 
 				if (immediately) {
 					$oldPage.hide();
