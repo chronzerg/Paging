@@ -35,14 +35,14 @@ afterEach(function () {
     this.dom();
 });
 
-describe('paging constructor', function () {
+describe('constructor', function () {
     it('should hide all but the first element', function () {
         var self = this;
         checkPageVisibility(self.$('#page1')).should.be.true();
     });
 });
 
-describe('switch to page', function () {
+describe('switch', function () {
     it('should hide all but the target page', function () {
         this.paging.switch('page2', true);
         checkPageVisibility(this.$('#page2')).should.be.true();
@@ -97,12 +97,23 @@ describe('callbacks', function () {
     describe('multiple of the same type', function () {
         it('should all be called upon the transition', function (done) {
             var count = cbCounter(2, done);
-            this.paging.beforeShow('page2', function cb1 () {
+            this.paging.beforeShow('page2', function () {
                 count.next();
             });
-            this.paging.beforeShow('page2', function cb2 () {
+            this.paging.beforeShow('page2', function () {
                 count.next();
             });
+            this.paging.switch('page2', true);
+        });
+    });
+
+    describe('once', function () {
+        it('should call the callback only once', function (done) {
+            this.paging.beforeShow('page2', function () {
+                done();
+            }, true);
+            this.paging.switch('page2', true);
+            this.paging.switch('page1', true);
             this.paging.switch('page2', true);
         });
     });

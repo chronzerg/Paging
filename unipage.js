@@ -36,7 +36,7 @@
 		return function () {
 			var id = nextId;
 			nextId++;
-			return id;
+			return id.toString();
 		};
 	})();
 
@@ -69,41 +69,50 @@
 	}
 
 	// Checks if the given dataId for a callback is in the
-	// given $page's remove list.
+	// given $page's remove list. If the dataId is found,
+	// it is removed from the remove list and true is
+	// returned. Else, false is returned.
 	function checkRemoveList ($page, dataId) {
 		var list = $page.data(RM) || [];
-		return list.indexOf(dataId) >= 0;
+		var i = list.indexOf(dataId);
+
+		if (i >= 0) {
+			list.splice(i, 1);
+			$page.data(RM, list);
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	function addCallback ($page, callbackType, callback, once) {
 		var dataId = addData($page, callbackType, callback);
-		var remover = getRemover($page, callbackType, dataId);
 
 		// If once, we add the callback to the list of callbacks
 		// to be removed. The callback will then be removed after its
 		// called.
 		if (once) {
-			$page.addDataWithoutId($page, RM, dataId);
+			addDataWithoutId($page, RM, dataId);
 		}
 
-		return remover;
+		return getRemover($page, callbackType, dataId);
 	}
 
 	// Call the callbacks attached to the given dataType on the
 	// given page.
 	function callCallbacks ($page, dataType) {
-		var callbacks = $page.data(dataType);
-		if (callbacks !== undefined) {
-			for (var dataId in callbacks) {
-				callbacks[dataId]();
-				
-				// Check if this callback is on the remove list.
-				// If so, remove it so it doesn't get called again.
-				if (checkRemoveList($page, dataId)) {
-					delete callbacks[dataId];
-				}
+		var callbacks = $page.data(dataType) || {};
+		for (var dataId in callbacks) {
+			callbacks[dataId]();
+			
+			// Check if this callback is on the remove list.
+			// If so, remove it so it doesn't get called again.
+			if (checkRemoveList($page, dataId)) {
+				delete callbacks[dataId];
 			}
 		}
+		$page.data(dataType, callbacks);		
 	}
 
 	// Runs down the chain of children for the given page
@@ -123,7 +132,7 @@
 
 	// Adds defaults to the given options object, only
 	// if the defaults aren't already defined.
-	var addDefaults = (function () {
+	var addDefaults = (function addDefaultsFactory () {
 		var defaults = {
 			fadeOut: 400
 		};
