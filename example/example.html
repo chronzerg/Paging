@@ -52,10 +52,10 @@
             var mainPages = setupUnipage($('#main-pages').children('div'));
             var subPages = setupUnipage($('#sub-pages').children('div'));
 
-            $('#button1').click(function () { mainPages.switchToPage('main-page1'); });
-            $('#button2').click(function () { mainPages.switchToPage('main-page2'); });
-            $('#button3').click(function () { subPages.switchToPage('sub-page1'); });
-            $('#button4').click(function () { subPages.switchToPage('sub-page2'); });
+            $('#button1').click(function () { mainPages.switch('main-page1'); });
+            $('#button2').click(function () { mainPages.switch('main-page2'); });
+            $('#button3').click(function () { subPages.switch('sub-page1'); });
+            $('#button4').click(function () { subPages.switch('sub-page2'); });
         </script>
     </body>
 </html>

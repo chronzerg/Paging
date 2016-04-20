@@ -3,17 +3,17 @@
 
 	// AMD Support
 	if (typeof define === "function" && define.amd) {
-		define(['lodash'], factory);
+		define(factory);
 	}
 	// NodeJS Support
 	else if (typeof module === "object" && module.exports) {
-		module.exports = factory(require('lodash'));
+		module.exports = factory();
 	}
 	// Regular Support
 	else {
-		root.setupUnipage = factory(root._);
+		root.setupUnipage = factory();
 	}
-})(this, function factory (_) {
+})(this, function factory () {
 	'use strict';
 
 	// Data types
@@ -21,6 +21,7 @@
 		BS = "unipage_BeforeShowCallbacks",
 		AH = "unipage_AfterHideCallbacks",
 		AS = "unipage_AfterShowCallbacks",
+		RM = "unipage_RemoveCallbacks",
 		CH = "unipage_ChildInstances",
 
 	// Open page class
@@ -39,6 +40,23 @@
 		};
 	})();
 
+	// Add data of dataType to the given $page.
+	function addData ($page, dataType, item) {
+		var dataId = getDataId(),
+			data = $page.data(dataType) || {};
+		data[dataId] = item;
+		$page.data(dataType, data);
+
+		return dataId;
+	}
+
+	// Add data of the dataType to the given $page.
+	function addDataWithoutId ($page, dataType, item) {
+		var data = $page.data(dataType) || [];
+		data.push(item);
+		$page.data(dataType, data);
+	}
+
 	// Returns a remover function which removes the data
 	// item with the given data id, of the given data type,
 	// from the given $page.
@@ -50,15 +68,25 @@
 		};
 	}
 
-	// Add data of dataType to the given $page.
-	function addData ($page, dataType, item) {
-		var dataId = getDataId(),
-			data = $page.data(dataType) || {};
-		data[dataId] = item;
-		$page.data(dataType, data);
+	// Checks if the given dataId for a callback is in the
+	// given $page's remove list.
+	function checkRemoveList ($page, dataId) {
+		var list = $page.data(RM) || [];
+		return list.indexOf(dataId) >= 0;
+	}
 
-		// Return a method which removes the added callback.
-		return getRemover($page, dataType, dataId);
+	function addCallback ($page, callbackType, callback, once) {
+		var dataId = addData($page, callbackType, callback);
+		var remover = getRemover($page, callbackType, dataId);
+
+		// If once, we add the callback to the list of callbacks
+		// to be removed. The callback will then be removed after its
+		// called.
+		if (once) {
+			$page.addDataWithoutId($page, RM, dataId);
+		}
+
+		return remover;
 	}
 
 	// Call the callbacks attached to the given dataType on the
@@ -68,6 +96,12 @@
 		if (callbacks !== undefined) {
 			for (var dataId in callbacks) {
 				callbacks[dataId]();
+				
+				// Check if this callback is on the remove list.
+				// If so, remove it so it doesn't get called again.
+				if (checkRemoveList($page, dataId)) {
+					delete callbacks[dataId];
+				}
 			}
 		}
 	}
@@ -78,21 +112,35 @@
 		var children = $page.data(CH) || {};
 
 		(function callCallbacksRecursively (children) {
-			_.forOwn(children, function callChildsCallbacks (unipage) {
+			for (var dataId in children) {
+				var unipage = children[dataId];
 				var $openPage = unipage._getOpenPage();
 				unipage._callCallbacks($openPage, dataType);
 				callCallbacksRecursively($openPage.data(CH) || {});
-			});
+			}
 		})(children);
 	}
 
-	var defaults = {
-		fadeTime: 400
-	};
+	// Adds defaults to the given options object, only
+	// if the defaults aren't already defined.
+	var addDefaults = (function () {
+		var defaults = {
+			fadeOut: 400
+		};
+
+		return function (options) {
+			for (var key in defaults) {
+				if (options[key] === undefined) {
+					options[key] = defaults[key];
+				}
+			}
+			return options;
+		}
+	})();
 
 	return function setupUnipage ($pages, options) {
 
-		var options = _.defaults(options, defaults);
+		options = addDefaults(options || {});
 
 		// Get the page specified by the id.
 		function getPage (id) {
@@ -111,7 +159,7 @@
 			
 			// Open the page with the given id, close the currently open
 			// page, and call all relevant callbacks.
-			switchToPage: function switchToPage (id, callback, immediately) {
+			switch: function (id, immediately) {
 				var $oldPage = getOpenPage(),
 				    $newPage = getPage(id);
 
@@ -140,7 +188,6 @@
 					callCallbacks($oldPage, AH);
 					callCallbacks($newPage, AS);
 					callCallbacksForChildren($newPage, AS);
-					if (callback) callback();
 				}
 
 				// Stop any switch page animations that may be
@@ -164,26 +211,26 @@
 
 			// Add a callback to be called before the page with
 			// the given id is hidden.
-			addBeforeHideCallback: function (id, callback) {
-				return addData(getPage(id), BH, callback);
+			beforeHide: function (id, callback, once) {
+				return addCallback(getPage(id), BH, callback, once);
 			},
 
 			// Add a callback to be called before the page with
 			// the given id is shown.
-			addBeforeShowCallback: function (id, callback) {
-				return addData(getPage(id), BS, callback);
+			beforeShow: function (id, callback, once) {
+				return addCallback(getPage(id), BS, callback, once);
 			},
 
 			// Add a callback to be called after the page with
 			// the given id is hidden.
-			addAfterHideCallback: function (id, callback) {
-				return addData(getPage(id), AH, callback);
+			afterHide: function (id, callback, once) {
+				return addCallback(getPage(id), AH, callback, once);
 			},
 
 			// Add a callback to be called after the page with
 			// the given id is shown.
-			addAfterShowCallback: function (id, callback) {
-				return addData(getPage(id), AS, callback);
+			afterShow: function (id, callback, once) {
+				return addCallback(getPage(id), AS, callback, once);
 			},
 
 			// Attach a child unipage instance to the page with
@@ -191,8 +238,10 @@
 			// page of the child instance will get its 'before
 			// show' and 'after show' callbacks called. This is
 			// recursively applied down the generations.
-			attachChildUnipage: function (id, unipageInstance) {
-				return addData(getPage(id), CH, unipageInstance);
+			child: function (id, unipageInstance) {
+				var $page = getPage(id);
+				var dataId = addData($page, CH, unipageInstance);
+				return getRemover($page, CH, dataId);
 			},
 
 			// Internal use
