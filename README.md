@@ -27,16 +27,19 @@ inst.switch('page1'); // fires the above callback...
 ```
 
 ## API
+### Constructor
 ```javascript
 var instance = setupUnipage($pages);
 ```
 This function returns a new Unipage instance. `$pages` is a jQuery object which only contains the DIV elements representing each view. The first DIV will automatically be opened when the instance is created. Elements other than DIVs may be able to work, but are not tested.
 
+### Switching Views
 ```javascript
 instance.switch(id, immediately);
 ```
 This function opens a new view, closing the currently opened view. `id` is the value of the ID attribute of the view to open. The currently open view is faded out using jQuery's fadeOut animation before the new view is displayed. `immediately` is an optional parameter that, when true, causes the switch to happen immediately without the fade out transition.
 
+### Callback Hooks
 ```javascript
 var remover = instance.beforeHide(id, callback, once);
 var remover = instance.beforeShow(id, callback, once);
@@ -45,6 +48,7 @@ var remover = instance.afterShow(id, callback, once);
 ```
 These functions add a callback to be called at the specified point in view transition. `id` is the ID attribute of the view to open. `callback` is the function to call. `once` is an optional parameter that, when true, causes the callback to be only called once, and then removed from the callback list. `beforeShow()` and `beforeHide()` are called before a view is opened or closed respectively, and `afterShow()` and `afterHide()` are called after a view is opened or closed respectively. These functions return a remover function. When the remover function is called, the given callback is removed from the list of callbacks.
 
+### Child Instances
 ```javascript
 var remover = instance.child(id, childInstance);
 ```
