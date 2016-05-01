@@ -5,6 +5,7 @@
   "scripts": {
     "test": "node_modules/.bin/mocha"
   },
+  "main": "unipage.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/chronzerg/Unipage.git"
@@ -23,7 +24,6 @@
     "should": "^8.3.0"
   },
   "dependencies": {
-    "lodash": "^4.11.1",
     "jquery": "^1.7.4"
   }
 }
